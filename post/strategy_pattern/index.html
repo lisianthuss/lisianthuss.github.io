@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Strategy Pattern &middot; My New Hugo Site</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="My New Hugo Site" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">My New Hugo Site</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/post/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+    <span>Written by</span>
+        
+        <br>
+        <span>on&nbsp;</span><time datetime="2020-03-03 08:50:15 &#43;0900 KST">March 3, 2020</time>
+</div>
+		<h1 class="post-title">Strategy Pattern</h1>
+<div class="post-line"></div>
+
+		
+
+		<blockquote>
+<p>같은 문제를 해결하는 여러 알고리즘이 클래스별로 캡슐화되어 있고, 필요할 때 교체할 수 있도록 함으로써 동일한 문제를 다른 알고리즘으로 해결할 수 있게 하는 디자인 패턴이다.</p>
+</blockquote>
+<p><img src="/img/strategy.svg" alt="strategy_pattern"></p>
+<ul>
+<li>Strategy<br>
+&ndash; 인터페이스나 추상 클래스, 외부에도 동일한 방식으로 호출하는 방식을 명시</li>
+<li>ConcreteStrategy<br>
+&ndash; 알고리즘을 실제로 구현</li>
+<li>Context<br>
+&ndash; strategy 패턴을 실제로 이용. 동적으로 전략을 바꾸도록 setter method 제공</li>
+</ul>
+<h2 id="예제--로봇-만들기-">예제 ( 로봇 만들기 )</h2>
+<h3 id="1-기본-설계">1. 기본 설계</h3>
+<p><img src="/img/strategy_robot1.svg" alt="robot1"></p>
+<p>공격과이동이 가능한 태권v와 아톰을 위와 같이 설계할 수 있다.</p>
+<h3 id="2-문제점">2. 문제점</h3>
+<ul>
+<li>기존 공격과 이동 방법을 수정하려면 어떤 변경을 해야하나? 아톰이 날 수 없고 걷게만 만들고 싶으면? 태권v를 날게 하려면?</li>
+<li>새로운 로봇을 만들어 기존 공격 또는 이동 방법을 추가, 수정하려면? 새로운 로봇을 만들어 태권v의 미사일 공격을 추가한다면?</li>
+</ul>
+<h3 id="21-기존-공격과-이동-방법을-수정하는-경우">2.1 기존 공격과 이동 방법을 수정하는 경우</h3>
+<ul>
+<li>기존 코드의 내용을 수정해기 때문에 OCP에 위배된다.</li>
+<li>두 클래스의 move가 동일한 기능을 수행하므로 중복이 발생된다.</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TaekwonV</span> <span style="color:#66d9ef">extends</span> Robot <span style="color:#f92672">{</span>
+    <span style="color:#f92672">...</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">move</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;I can only walk.&#34;</span><span style="color:#f92672">);</span>
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Atom</span> <span style="color:#66d9ef">extends</span> Robot <span style="color:#f92672">{</span>
+    <span style="color:#f92672">...</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">move</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;I can only walk.&#34;</span><span style="color:#f92672">);</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="22-새로운-로봇에-공격-이동-방법을-추가수정하는-경우">2.2 새로운 로봇에 공격 이동 방법을 추가/수정하는 경우</h3>
+<ul>
+<li>새 로봇 클래스를 추가하고 로봇의 sub 클래스로 둔다</li>
+<li>하지만 다른 로봇의 공격/이동 방법을 사용하려고 할 때, 코드 중복이 발생하게 된다.</li>
+</ul>
+<p><img src="/img/strategy_robot2.svg" alt="robot1"></p>
+<h3 id="3-해결책">3. 해결책</h3>
+<blockquote>
+<p>무엇이 변화되었는지를 찾은 후에 이를 클래스로 캡슐화한다.</p>
+</blockquote>
+<ul>
+<li>문제를 발생시키는 요인은 공격과 이동방법의 변화다.</li>
+<li>기존의 로봇이나 새로운 로봇이 이러한 기능을 별다른 코드 변경 없이 제공받거나,</li>
+<li>기존의 공격이나 이동방법을 다른 공격이나 이동방법으로 쉽게 변경할 수 있어야 한다.</li>
+</ul>
+<p>공격과 이동을 위한 인터페이스를 각각 만들고 이들을 구현한 클래스를 만들어야 한다.</p>
+<p><img src="/img/strategy_robot3.svg" alt="robot1"></p>
+<ul>
+<li>Robot 클래스 입장에서 보면 공격 / 이동 방법이 AttackStrategy, MovingStrategy 인터페이스에 의해 캡슐화 되어 있다.</li>
+<li>새로운 공격 방법이 추가도더라도 AttackStrategy 인터페이스가 Robot 클래스의 변경을 차단해준다.</li>
+<li>즉 새로운 기능의 추가가 기존의 코드에 영향을 미치지 못한다.</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Robot</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> MovinStrategy movingStrategy
+    <span style="color:#66d9ef">private</span> AttackStrategy attackStrategy
+<span style="color:#f92672">}</span>
+<span style="color:#f92672">...</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setMovingStrategy</span><span style="color:#f92672">(</span>MovingStrategy movingStrategy<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">movingStrategy</span> <span style="color:#f92672">=</span> movingStrategy<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setAttackStrategy</span><span style="color:#f92672">(</span>AttackStrategy attackStrategy<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">attackStrategy</span> <span style="color:#f92672">=</span> attackStrategy<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+<span style="color:#f92672">...</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+    Robot taekwonV <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TaekwonV<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;TaekwonV&#34;</span><span style="color:#f92672">);</span>
+    Robot atom <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Atom<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Atom&#34;</span><span style="color:#f92672">);</span>
+
+    taekwonV<span style="color:#f92672">.</span><span style="color:#a6e22e">setMovingStrategy</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> WalkingStrategy<span style="color:#f92672">());</span>
+    taekwonV<span style="color:#f92672">.</span><span style="color:#a6e22e">setAttackStrategy</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> MissileStrategy<span style="color:#f92672">());</span>
+
+    atom<span style="color:#f92672">.</span><span style="color:#a6e22e">setMovingStrategy</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> FlyStrategy<span style="color:#f92672">());</span>
+    atom<span style="color:#f92672">.</span><span style="color:#a6e22e">setAttackStrategy</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> FunchStrategy<span style="color:#f92672">());</span>
+
+    taekwonV<span style="color:#f92672">.</span><span style="color:#a6e22e">move</span><span style="color:#f92672">();</span>
+    taekwonV<span style="color:#f92672">.</span><span style="color:#a6e22e">attack</span><span style="color:#f92672">();</span>
+
+    atom<span style="color:#f92672">.</span><span style="color:#a6e22e">move</span><span style="color:#f92672">();</span>
+    atom<span style="color:#f92672">.</span><span style="color:#a6e22e">attack</span><span style="color:#f92672">();</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><hr>
+<p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-03-03 16:46:01.440807 &#43;0900 KST m=&#43;0.071822191">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>
