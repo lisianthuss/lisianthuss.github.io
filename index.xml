@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>My New Hugo Site</title>
-    <link>http://example.org/</link>
-    <description>Recent content on My New Hugo Site</description>
+    <title>잠들지 않는 시간</title>
+    <link>https://lisianthuss.github.io/</link>
+    <description>Recent content on 잠들지 않는 시간</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 03 Mar 2020 08:50:15 +0900</lastBuildDate>
     
-	<atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://lisianthuss.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Strategy Pattern</title>
-      <link>http://example.org/post/strategy_pattern/</link>
+      <link>https://lisianthuss.github.io/post/strategy_pattern/</link>
       <pubDate>Tue, 03 Mar 2020 08:50:15 +0900</pubDate>
       
-      <guid>http://example.org/post/strategy_pattern/</guid>
+      <guid>https://lisianthuss.github.io/post/strategy_pattern/</guid>
       <description>같은 문제를 해결하는 여러 알고리즘이 클래스별로 캡슐화되어 있고, 필요할 때 교체할 수 있도록 함으로써 동일한 문제를 다른 알고리즘으로 해결할 수 있게 하는 디자인 패턴이다.
   Strategy
 &amp;ndash; 인터페이스나 추상 클래스, 외부에도 동일한 방식으로 호출하는 방식을 명시 ConcreteStrategy
