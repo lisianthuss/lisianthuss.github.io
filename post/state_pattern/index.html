@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>State Pattern &middot; 잠들지 않는 시간</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="잠들지 않는 시간" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">잠들지 않는 시간</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/post/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+    <span>Written by</span>
+        
+        <br>
+        <span>on&nbsp;</span><time datetime="2020-03-03 09:53:50 &#43;0900 KST">March 3, 2020</time>
+</div>
+		<h1 class="post-title">State Pattern</h1>
+<div class="post-line"></div>
+
+		
+
+		<blockquote>
+<p>상황에 따라 동일한 작업이 다른 방식으로 실행될 때, 해당 상태가 작업을 수행하도록 위임하는 디자인 패턴이다.</p>
+</blockquote>
+<h3 id="일을-수행할-때-상태-하나하나가-어떤-상태인지-확인해서-일을-다르게-수행한다면">일을 수행할 때 상태 하나하나가 어떤 상태인지 확인해서 일을 다르게 수행한다면?</h3>
+<ol>
+<li>복잡한 조건식이 있는 코드가 만들어진다.</li>
+<li>코드를 이해하거나 수정하기 어렵게 된다.</li>
+</ol>
+<h3 id="state-pattern을-사용하려면">State Pattern을 사용하려면?</h3>
+<p><em>어떤 행위를 해야할 때, 상태에 행위를 수행하도록 위임한다</em></p>
+<ol>
+<li>시스템의 각 상태를 <strong>클래스로 분리</strong>해 표현</li>
+<li>각 클래서에서 수행하는 행위들을 <strong>method로 구현</strong></li>
+<li>외부로부터 캡슐화하기 위해 <strong>인터페이스 생성</strong></li>
+<li>시스템의 각 상태를 나타내는 클래스가 <strong>실체화</strong>하게 한다.</li>
+</ol>
+<p><img src="/img/state.svg" alt="state"></p>
+<ul>
+<li>State<br>
+&ndash; 시스템의 모든 상태에 공통적인 인터페이스를 제공</li>
+<li>State1, State2, State3<br>
+&ndash; Context 객체가 요청한 작업을 자신의 방식으로 실행</li>
+<li>Context<br>
+&ndash; State를 이용하여 원하는 작업을 수행. 생태를 변경하는 setState method가 있고 실제 행위를 실행하는 대신 해당 상태 객체에 행위 실행을 요청하는 request method가 있다</li>
+</ul>
+<h2 id="예제--형광등-만들기-">예제 ( 형광등 만들기 )</h2>
+<h3 id="1-형광등-동작">1. 형광등 동작</h3>
+<p>형광등 상태와 누른 버튼에 따라 다음과 같이 동작한다.</p>
+<table>
+<thead>
+<tr>
+<th align="center">형광등 상태</th>
+<th align="center">On 버튼</th>
+<th align="center">Off 버튼</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">On</td>
+<td align="center">반응 없음</td>
+<td align="center">형광등 Off</td>
+</tr>
+<tr>
+<td align="center">Off</td>
+<td align="center">형광등 On</td>
+<td align="center">반응 없음</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Light</span> {
+    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> ON <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#75715e">// 형광등이 켜진 상태
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> OFF <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// 형광등이 꺼진 상태
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> state <span style="color:#f92672">=</span> OFF;
+    
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">on_btn_pushed</span>() {
+        <span style="color:#66d9ef">if</span> (state <span style="color:#f92672">==</span> ON)
+            <span style="color:#75715e">// nothing
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">else</span>
+            print(<span style="color:#e6db74">&#34;light on&#34;</span>)
+            state <span style="color:#f92672">=</span> ON;
+    }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">off_btn_pushed</span>() {
+        <span style="color:#66d9ef">if</span> (state <span style="color:#f92672">==</span> OFF)
+            <span style="color:#75715e">// nothing
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">else</span>
+            print(<span style="color:#e6db74">&#34;light off&#34;</span>)
+            state <span style="color:#f92672">=</span> OFF;
+    }
+}
+</code></pre></div><h3 id="2-문제점">2. 문제점</h3>
+<p>형광등에 새로운 상태를 추가한다면?</p>
+<table>
+<thead>
+<tr>
+<th align="center">형광등 상태</th>
+<th align="center">On 버튼</th>
+<th align="center">Off 버튼</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">On</td>
+<td align="center">취침등</td>
+<td align="center">형광등 Off</td>
+</tr>
+<tr>
+<td align="center">Off</td>
+<td align="center">형광등 On</td>
+<td align="center">반응 없음</td>
+</tr>
+<tr>
+<td align="center">취침등</td>
+<td align="center">형광등 On</td>
+<td align="center">반응 없음</td>
+</tr>
+</tbody>
+</table>
+<p>추가되는 조건에 따라 if-else 를 추가하면 아름답지 않은 코드가 만들어진다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Light</span> {
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> ON <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#75715e">// 형광등이 켜진 상태
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> OFF <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// 형광등이 꺼진 상태
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> SLEEPING <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
+    <span style="color:#66d9ef">int</span> state <span style="color:#f92672">=</span> OFF;
+    
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">void</span> on_btn_pushed() {
+        <span style="color:#66d9ef">if</span> (state <span style="color:#f92672">==</span> ON)
+            <span style="color:#75715e">// nothing
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (state <span style="color:#f92672">==</span> SLEEPING)
+            print(<span style="color:#e6db74">&#34;light on&#34;</span>)
+            state <span style="color:#f92672">=</span> ON;
+        <span style="color:#66d9ef">else</span>
+            <span style="color:#a6e22e">print</span>(<span style="color:#e6db74">&#34;light on&#34;</span>)
+            state <span style="color:#f92672">=</span> ON;
+    }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">off_btn_pushed</span>() {
+        <span style="color:#66d9ef">if</span> (state <span style="color:#f92672">==</span> OFF)
+            <span style="color:#75715e">// nothing
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">else</span>
+            print(<span style="color:#e6db74">&#34;light off&#34;</span>)
+            state <span style="color:#f92672">=</span> OFF;
+    }
+}
+</code></pre></div><h3 id="3-해결책">3. 해결책</h3>
+<p>변하는 부분을 찾아서 <strong>캡슐화</strong> 해보자.<br>
+목표는 현재 시스템이 어떤 상태에 있는지와 상관없게 구성하고, 상태 변화에도 독립적이도록 수정하는 것이다.</p>
+<p><img src="/img/state_light.svg" alt="light"></p>
+<p>Strategy 패턴과 구조가 동일하다. Light 클래스에서 구체적인 상태 클래스가 아닌 State 인터페이스만 참조하므로, 현재 상태와 무관하게 코드를 작성할 수 있다.<br>
+또한 매번 On, Off 인스턴스를 생성하지 않고 singleton 기반으로 변경하면 다음과 같다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">State</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">on_button_pushed</span><span style="color:#f92672">(</span>Light light<span style="color:#f92672">);</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">off_button_pushed</span><span style="color:#f92672">(</span>Light light<span style="color:#f92672">);</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">On</span> <span style="color:#66d9ef">implements</span> State <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> On on <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> On<span style="color:#f92672">();</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">on_button_pushed</span><span style="color:#f92672">(</span>Light light<span style="color:#f92672">)</span> <span style="color:#f92672">{}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">off_button_pushed</span><span style="color:#f92672">(</span>Light light<span style="color:#f92672">)</span>
+    <span style="color:#f92672">{</span>
+        print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;light off&#34;</span><span style="color:#f92672">);</span>
+        light<span style="color:#f92672">.</span><span style="color:#a6e22e">setState</span><span style="color:#f92672">(</span>Off<span style="color:#f92672">.</span><span style="color:#a6e22e">getInstance</span><span style="color:#f92672">());</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Off</span> <span style="color:#66d9ef">implements</span> State <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> Off off <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Off<span style="color:#f92672">();</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">on_button_pushed</span><span style="color:#f92672">(</span>Light light<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        print<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;light on&#34;</span><span style="color:#f92672">);</span>
+        light<span style="color:#f92672">.</span><span style="color:#a6e22e">setState</span><span style="color:#f92672">(</span>On<span style="color:#f92672">.</span><span style="color:#a6e22e">getInstance</span><span style="color:#f92672">());</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">off_button_pushed</span><span style="color:#f92672">(</span>Light light<span style="color:#f92672">){}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Light</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> State state<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Light</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        state <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Off<span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setState</span><span style="color:#f92672">(</span>State state<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>state <span style="color:#f92672">=</span> state<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">on_button_pushed</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>state<span style="color:#f92672">.</span><span style="color:#a6e22e">on_button_pushed</span><span style="color:#f92672">(</span><span style="color:#66d9ef">this</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">off_button_pushed</span><span style="color:#f92672">(</span>Light light<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>state<span style="color:#f92672">.</span><span style="color:#a6e22e">off_button_pushed</span><span style="color:#f92672">(</span><span style="color:#66d9ef">this</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="4-strategy-pattern-vs-state-pattern">4. Strategy Pattern vs. State Pattern</h3>
+<p>같은점</p>
+<ul>
+<li>행위를 별도의 클래스로 캡슐화한다.<br>
+&ndash; Strategy Pattern: Strategy class<br>
+&ndash; State Pattern: State class</li>
+<li>실제 작업 수행을 위임한다</li>
+<li>실행 중에 행위를 변경할 수 있다.</li>
+</ul>
+<p>차이점</p>
+<ul>
+<li>State Pattern 에서 클라이언트는 상태 객체와 관련된 어떤 지식도 없다.</li>
+<li>행위를 변경하는 주체가 다르다.<br>
+&ndash; Strategy Pattern: 행위 시작과 변경이 Client 클래스에서 이루어지며 통제된다.<br>
+&ndash; State Pattern: 상태 변경을 State 요소를 구현한 클래서 자신이 수행.</li>
+</ul>
+<p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="/post/singleton_pattern/" class="left arrow">&#8592;</a>
+		<a href="/post/command_pattern/" class="right arrow">&#8594;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-03-06 09:58:25.980338 &#43;0900 KST m=&#43;0.080287650">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>

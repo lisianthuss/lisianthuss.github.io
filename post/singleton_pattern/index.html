@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Singleton Pattern &middot; 잠들지 않는 시간</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="잠들지 않는 시간" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">잠들지 않는 시간</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/post/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+    <span>Written by</span>
+        
+        <br>
+        <span>on&nbsp;</span><time datetime="2020-03-03 09:28:31 &#43;0900 KST">March 3, 2020</time>
+</div>
+		<h1 class="post-title">Singleton Pattern</h1>
+<div class="post-line"></div>
+
+		
+
+		<blockquote>
+<p>인스턴스가 하나만 생성되는 것을 보장하며 어디에서든 이 인스턴스에 접근할 수 있는 디자인 패턴이다</p>
+</blockquote>
+<p><img src="/img/singleton.svg" alt="singleton"></p>
+<h2 id="예제--프린터-관리자-만들기-">예제 ( 프린터 관리자 만들기 )</h2>
+<h3 id="1-단-하나의-프린터객체만-생성해-어디서든-참조할-수-있게-해보자">1. 단 하나의 프린터(객체)만 생성해 어디서든 참조할 수 있게 해보자.</h3>
+<p>new Printer() 가 호출되지 않도록 생성자를 private로 변경하고, 한 번만 호출되도록 getPrinter에 static 속성을 부여하면, Printer 인스턴스가 생성된 상황이라면 그 인스턴스를 반환하며, 없다면 새로 생성해서 반환한다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Printer</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> Printer printer <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#a6e22e">Printer</span><span style="color:#f92672">()</span> <span style="color:#f92672">{}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Printer <span style="color:#a6e22e">getPrinter</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>printer <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span>
+            printer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Printer<span style="color:#f92672">();</span>
+
+        <span style="color:#66d9ef">return</span> printer<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">print</span><span style="color:#f92672">(</span>Resource r<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#f92672">...</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="2-문제점">2. 문제점</h3>
+<p>race condition 발생</p>
+<blockquote>
+<p>메모리와 같은 동일한 자원을 2개 이상의 스레드가 이용하려고 하는 현상</p>
+</blockquote>
+<p>printer 변수가 null인 것을 확인하고 스레드 A 가 인스턴스를 생성할 때, 동시에 스레드 2도 null인 것을 확인하고 인스턴스를 생성하려고 시도할 수 있다. 결국 두 개의 인스턴스가 생성된다.</p>
+<h3 id="3-해결책">3. 해결책</h3>
+<ul>
+<li>정적 변수에 인스턴스를 만들어 바로 초기화하는 방법</li>
+<li>인스턴스를 만드는 method에 동기화하는 방법</li>
+</ul>
+<h4 id="31-정적-변수에-인스턴스를-만들어-바로-초기화하는-방법">3.1 정적 변수에 인스턴스를 만들어 바로 초기화하는 방법</h4>
+<p>정적 변수는 객체가 생성되기 전 클래스가 메모리에 로딩될 때 만들어져 초기화가 한 번만 실행된다.<br>
+따라 중복 생성 없이 이미 생성된 printer를 반환할 수 있다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Printer</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> Printer printer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Printer<span style="color:#f92672">();</span>
+    prinvate <span style="color:#a6e22e">Printer</span><span style="color:#f92672">()</span> <span style="color:#f92672">{}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Printer <span style="color:#a6e22e">getPrinter</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> printer<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h4 id="32-인스턴스를-만드는-method에-동기화하는-방법">3.2 인스턴스를 만드는 method에 동기화하는 방법</h4>
+<p>다중 스레드 환경에서 동시에 여러 스레드가 getPrinter method를 소유하는 객체이 접근하는 것을 방지하지한다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Printer</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> Printer printer <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+    prinvate <span style="color:#a6e22e">Printer</span><span style="color:#f92672">()</span> <span style="color:#f92672">{}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">synchronized</span> <span style="color:#66d9ef">static</span> Printer <span style="color:#a6e22e">getPrinter</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> printer<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="/post/strategy_pattern/" class="left arrow">&#8592;</a>
+		<a href="/post/state_pattern/" class="right arrow">&#8594;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-03-06 09:58:25.970093 &#43;0900 KST m=&#43;0.070042100">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>

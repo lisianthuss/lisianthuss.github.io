@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Command Pattern &middot; 잠들지 않는 시간</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="잠들지 않는 시간" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">잠들지 않는 시간</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/post/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+    <span>Written by</span>
+        
+        <br>
+        <span>on&nbsp;</span><time datetime="2020-03-03 11:06:56 &#43;0900 KST">March 3, 2020</time>
+</div>
+		<h1 class="post-title">Command Pattern</h1>
+<div class="post-line"></div>
+
+		
+
+		<blockquote>
+<p>실행될 기능을 캡슐화하여, 기능 실행을 요구하는 호출자(Invoker) 클래스와, 실제 기능을 수행하는 수신자(Receiver) 클래스 사이의 의존성을 제거한다.<br>
+따라서 실행될 기능의 변경에도 호출자 클래스를 수정 없이 그대로 사용할 수 있다.</p>
+</blockquote>
+<h3 id="언제-사용하지">언제 사용하지?</h3>
+<p>이벤트가 발생했을 때 실행될 기능이 다양하면서도 변경이 필요한 경우, 이벤트를 발생시키는 클래스를 변경하지 않고 재사용하고자 할 때 유용하다.</p>
+<p><img src="/img/command.svg" alt="command"></p>
+<ul>
+<li>Command<br>
+&ndash; 실행될 기능에 대한 인터페이스. 실행될 기능을 execute method로 선언함.</li>
+<li>ConcreteCommand<br>
+&ndash; 실제로 실행되는 기능을 구현.</li>
+<li>Invoker<br>
+&ndash; 기능의 실행을 요청하는 호출자 클래스</li>
+<li>Receiver<br>
+&ndash; ConcreteCommand에서 execute method를 구현할 때 필요한 클래스. ConcreteCommand의 기능을 실행하기 위해 사용하는 수신자 클래스</li>
+</ul>
+<h2 id="예제--만능-버튼-만들기-">예제 ( 만능 버튼 만들기 )</h2>
+<ul>
+<li>버튼을 누르면 램프 켜짐: Button class</li>
+<li>불 키는 기능: Lamp class</li>
+</ul>
+<p>Button 클래스에 Lamp 인스턴스를 전달해서 버튼을 누르는 구현이 가능하다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+    Lamp lamp <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Lamp<span style="color:#f92672">();</span>
+    BUtton lampButton <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Button<span style="color:#f92672">(</span>lamp<span style="color:#f92672">);</span>
+    lampButton<span style="color:#f92672">.</span><span style="color:#a6e22e">pressed</span><span style="color:#f92672">();</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="1-문제점">1. 문제점</h3>
+<ul>
+<li>버튼을 눌렀을 때 불이 켜지는 대신, 다른 기능을 하려면?</li>
+<li>버튼을 처음 누르면 불이 켜지고, 다시 한 번 누르면 알람을 동작하게 하려면?</li>
+</ul>
+<h3 id="11-버튼을-눌렀을-때-불이-켜지는-대신-다른-기능을-실행하는-경우">1.1 버튼을 눌렀을 때 불이 켜지는 대신, 다른 기능을 실행하는 경우</h3>
+<p>기능을 변경하려고 Button 클래스의 코드를 수정하는 것은 OCP 위배.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">pressed</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+    <span style="color:#75715e">// theLamp.turnOn();
+</span><span style="color:#75715e"></span>
+    theAlarm<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">();</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="12-버튼을-처음-누르면-불이-켜지고-다시-한-번-누르면-알람을-동작하게-하려면">1.2 버튼을 처음 누르면 불이 켜지고, 다시 한 번 누르면 알람을 동작하게 하려면?</h3>
+<p>기능 변경을 위해 Button 클래스를 수정해야 한다.<br>
+기능을 추가할 때마다 코드를 수정해야 하기 때문에 Button 클래스를 재사용하기 어렵다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Button</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setMode</span><span style="color:#f92672">(</span>Mode mode<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">theMode</span> <span style="color:#f92672">=</span> mode<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">pressed</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">switch</span> <span style="color:#f92672">(</span>theMode<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">case</span> LAMP<span style="color:#f92672">:</span>
+                theLamp<span style="color:#f92672">.</span><span style="color:#a6e22e">turnOn</span><span style="color:#f92672">;</span>
+                <span style="color:#66d9ef">break</span><span style="color:#f92672">;</span>
+            <span style="color:#66d9ef">case</span> ALARM<span style="color:#f92672">:</span>
+                theAlarm<span style="color:#f92672">.</span><span style="color:#a6e22e">start</span><span style="color:#f92672">()</span>
+                <span style="color:#66d9ef">break</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="13-해결책">1.3 해결책</h3>
+<p>Button 클래스의 pressed() 에서 기능을 구현하는 대신 외부에서 제공받아 캡슐화해 pressed()에서 호출하자.<br>
+Button 클래스에서는 pressed() 에서 Command 인터페이스의 execute() 를 호출하여 알람이나 램프를 켤 수 있다.</p>
+<p><img src="/img/command_button.svg" alt="button"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Command</span> {
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">execute</span>();
+}
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Lamp</span> {
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">turnOn</span>() { printf(<span style="color:#e6db74">&#34;lamp on&#34;</span>); }
+}
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LampOnCommand</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Command {
+    LampOnCommand(Lamp<span style="color:#f92672">*</span> lamp) { <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>lamp <span style="color:#f92672">=</span> lamp; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">execute</span>() { lamp<span style="color:#f92672">-&gt;</span>turnOn(); }
+
+    Lamp<span style="color:#f92672">*</span> lamp;
+}
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Alarm</span> {
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">start</span>() { printf(<span style="color:#e6db74">&#34;alarming&#34;</span>); }
+}
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AlarmOnCommand</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Command {
+    AlarmOnCommand(Alarm<span style="color:#f92672">*</span> alarm) { <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>alarm <span style="color:#f92672">=</span> alarm; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">execute</span>() { alarm<span style="color:#f92672">-&gt;</span>start(); }
+    
+    Alarm<span style="color:#f92672">*</span> alarm;
+}
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Button</span> {
+    Button(Command<span style="color:#f92672">*</span> cmd) { setCommand(cmd); }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setCommand</span>(Command newCommand) { command <span style="color:#f92672">=</span> newCommand; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">pressed</span>() { command.execute(); }
+    
+    Command<span style="color:#f92672">*</span> command;
+}
+
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>() {
+    Lamp<span style="color:#f92672">*</span> lamp <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Lamp();
+    Command<span style="color:#f92672">*</span> lampOnCommand <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LampOnCommand(lamp);
+
+    Button button1 <span style="color:#f92672">=</span> Button(LampOnCommand);
+    button1.pressed();
+
+    Alarm<span style="color:#f92672">*</span> alarm <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Alarm();
+    Command<span style="color:#f92672">*</span> alarmOnCommand <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AlarmOnCommand(alarm);
+
+    Button button2 <span style="color:#f92672">=</span> Button(AlarmOnCommand);
+    button2.pressed();
+
+    button2.setCommand(lampOnCommand);
+    button2.pressed();
+}
+</code></pre></div><p>버튼을 끄는 기능도 Button 클래스를 변경하지 않고 구현할 수 있다.</p>
+<p>버튼을 처음 눌렀을 때에는 램프를 켜고 두  번 누르면 끄는 기능을 구현해보자.</p>
+<p><img src="/img/command_button2.svg" alt="button2"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Command</span> {
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">execute</span>();
+}
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Button</span> {
+    Button(Command<span style="color:#f92672">*</span> cmd) { setCommand(cmd); }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setCommand</span>(Command newCommand) { command <span style="color:#f92672">=</span> newCommand; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">pressed</span>() { command.execute(); }
+    
+    Command<span style="color:#f92672">*</span> command;
+}
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Lamp</span> {
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">turnOn</span>() {
+        printf(<span style="color:#e6db74">&#34;Lamp on&#34;</span>);
+    }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">turnOff</span>() {
+        printf(<span style="color:#e6db74">&#34;Lamp off&#34;</span>);
+    }
+}
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LampOnCommand</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Command {
+    LampOnCommand(Lamp<span style="color:#f92672">*</span> theLamp) { <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>theLamp <span style="color:#f92672">=</span> theLamp; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">execute</span>() { theLamp<span style="color:#f92672">-&gt;</span>turnOn(); }
+    Lamp<span style="color:#f92672">*</span> theLamp;
+}
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LampOffCommand</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Command {
+    LampOffCommand(Lamp<span style="color:#f92672">*</span> theLamp) { <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>theLamp <span style="color:#f92672">=</span> theLamp; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">execute</span>() { theLamp<span style="color:#f92672">-&gt;</span>turnOff(); }
+    Lamp<span style="color:#f92672">*</span> theLamp;
+}
+
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>() {
+    Lamp<span style="color:#f92672">*</span> lamp <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Lamp();
+    Command<span style="color:#f92672">*</span> lampOnCommand <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LampOnCommand(lamp);
+    Command<span style="color:#f92672">*</span> lampOffCommand <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LampOffCommand(lamp);
+
+    Button<span style="color:#f92672">*</span> btn <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Button(lampOnCommand);
+    btn<span style="color:#f92672">-&gt;</span>pressed();
+
+    btn.setCommand(lampOffCommand);
+    btn<span style="color:#f92672">-&gt;</span>pressed();
+}
+</code></pre></div><h2 id="예제--elevator-">예제 ( Elevator )</h2>
+<h3 id="requirements">Requirements</h3>
+<ul>
+<li>Controller 는 목적지를 입력받아 하나의 엘리베이터를 이동시킨다.</li>
+<li>Manager는 여러개의 Controller를 관리한다. 목적지가 정해지면 적절한 Controller 를 배정한다.</li>
+<li>Button의 역할은 두 가지다.<br>
+&ndash; 엘리베이터 안에서 가고자 하는 목적지를 설정.
+&ndash; 자신이 위치한 층으로 엘리베이터를 호출</li>
+</ul>
+<p><img src="/img/command_elevator.svg" alt="elevator"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>() {
+    ElevatorController<span style="color:#f92672">*</span> controller1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorController(<span style="color:#ae81ff">1</span>);
+    ElevatorController<span style="color:#f92672">*</span> controller2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorController(<span style="color:#ae81ff">2</span>);
+
+    ElevatorManager<span style="color:#f92672">*</span> em <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorManager(<span style="color:#ae81ff">2</span>);
+    em.addController(controller1);
+    em.addController(controller2);
+
+    <span style="color:#75715e">// 1층에서 1번 엘리베이터 버튼 클릭
+</span><span style="color:#75715e"></span>    Command<span style="color:#f92672">*</span> destinationCommand1stController <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> DestinationSelectionCommand(<span style="color:#ae81ff">1</span>, controller1);
+    ElevatorButton<span style="color:#f92672">*</span> destinationButton1stFloor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorButton(destinationCommand1stController);
+    destinationButton1stFloor.pressed();
+
+    <span style="color:#75715e">// 2층에서 2번 엘리베이터 버튼 클릭
+</span><span style="color:#75715e"></span>    Command<span style="color:#f92672">*</span> destinationCommand2ndController <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> DestinationSelectionCommand(<span style="color:#ae81ff">2</span>, controller2);
+    ElevatorButton<span style="color:#f92672">*</span> destinationButton2ndFloor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorButton(destinationCommand2ndController);
+    destinationButton2ndFloor.pressed();
+
+    <span style="color:#75715e">// 1번 엘리베이터를 2층에서 아래로 이동시키려는 버튼
+</span><span style="color:#75715e"></span>    Command<span style="color:#f92672">*</span> requestDownCommand <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorRequestCommand(<span style="color:#ae81ff">2</span>, Direction.DOWN, em);
+    ElevatorButton<span style="color:#f92672">*</span> requestDownFloorButton2ndFloor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorButton(requestDownCommand);
+    requestDownFloorButton2ndFloor.pressed();
+}
+</code></pre></div><p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="/post/state_pattern/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-03-06 09:58:25.991539 &#43;0900 KST m=&#43;0.091488360">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>

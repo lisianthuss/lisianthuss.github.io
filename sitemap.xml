@@ -3,17 +3,32 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://lisianthuss.github.io/post/</loc>
-    <lastmod>2020-03-03T08:50:15+09:00</lastmod>
+    <loc>https://lisianthuss.github.io/post/command_pattern/</loc>
+    <lastmod>2020-03-03T11:06:56+09:00</lastmod>
   </url>
   
   <url>
-    <loc>https://lisianthuss.github.io/post/strategy_pattern/</loc>
-    <lastmod>2020-03-03T08:50:15+09:00</lastmod>
+    <loc>https://lisianthuss.github.io/post/</loc>
+    <lastmod>2020-03-03T11:06:56+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://lisianthuss.github.io/</loc>
+    <lastmod>2020-03-03T11:06:56+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lisianthuss.github.io/post/state_pattern/</loc>
+    <lastmod>2020-03-03T09:53:50+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lisianthuss.github.io/post/singleton_pattern/</loc>
+    <lastmod>2020-03-03T09:28:31+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lisianthuss.github.io/post/strategy_pattern/</loc>
     <lastmod>2020-03-03T08:50:15+09:00</lastmod>
   </url>
   
