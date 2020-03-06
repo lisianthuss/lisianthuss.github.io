@@ -62,17 +62,218 @@
 
 		
 
-		<p>커피 전문점에서 커피를 주문하는 과정을 객체들의 협력관계로 구현하자</p>
-<p>손님 객체 &ndash; 메뉴판 객체</p>
-<p>참고<br>
-객체지향의 사실과 오해</p>
+		<h3 id="1-커피-전문점에서-커피를-주문하는-과정을-객체들의-협력관계로-구현하자">1. 커피 전문점에서 커피를 주문하는 과정을 객체들의 협력관계로 구현하자</h3>
+<h4 id="객체들의-연관-관계">객체들의 연관 관계</h4>
+<p>[손님 객체] &mdash; 커피를 선택한다&mdash; [메뉴판 객체(아메리카노, 라떼)]<br>
+___|<br>
+___|  바리스타에서 커피를 주문한다<br>
+___|<br>
+[바리스타 객체] &mdash; 커피를 제조한다 &mdash; [아메리카노 객체, 카푸치노 객체, 라떼 객체]</p>
+<h3 id="2-설계하기">2. 설계하기</h3>
+<ul>
+<li>협력을 설계할 때에는 객체가 메시지를 선택하는 것이 아니라, 메시지가 객체를 선택하게 해야 한다.<br>
+&ndash; 메시지를 먼저 선택하고, 그 후에 메시지를 수신하기에 적절한 객체를 선택해야 한다.</li>
+<li>할당된 책임을 수행하는 도중에 스스로 할 수 없는 일이 있다면, 다른 객체에 요청해야 한다.<br>
+&ndash; 이 요청이 외부로 전송되는 메시지를 정의한다.</li>
+</ul>
+<h4 id="구성도">구성도</h4>
+<p>커피를 주문하라(in: 메뉴이름) ==&gt;  [손님] 메뉴 항목을 찾아라(in: 메뉴 이름, ret: 메뉴 항목) &lt;==&gt; [ 메뉴판 ]<br>
+[손님] 커피를 제조하라(in: 메뉴항목, ret: 커피) &lt;==&gt; [바리스타] 제조하라 ==&gt; [커피]</p>
+<h3 id="3-인터페이스">3. 인터페이스</h3>
+<p>각 객체가 수신하는 메시지
+[손님] &lt;== 커피를 주문하라(in: 메뉴이름)
+[메뉴판] &lt;== 메뉴 항목을 찾아라(in:메뉴이름, ret: 메뉴항목)
+[바리스타] &lt;== 커피를 제조하라(in: 메뉴항목, ret: 커피)
+[커피] &lt;== 제조하라</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Customer</span> {
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">order</span>(String menuName) {}
+};
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Menu</span> {
+    MenuItem <span style="color:#a6e22e">choose</span>(String name) {}
+};
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Barista</span> {
+    Coffee <span style="color:#a6e22e">makeCoffee</span>(MenuItem menuItem) {}
+};
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Coffee</span> {
+    Coffee(MenuItem menuItem) {}
+};
+</code></pre></div><h3 id="4-구현하기">4. 구현하기</h3>
+<h4 id="41-customer">4.1 Customer</h4>
+<p>Customer 는 Menu 에게 menuName 에 해당하는 MenuItem을 요청해서 이를 Barista 에게 전달해서 원하는 커피를 주문해야 한다.</p>
+<p>문제는</p>
+<ul>
+<li>Customer는 어떻게 Menu 객체아 Barista 객체에 접근할 것인가?</li>
+</ul>
+<p>객체가 다른 객체에 메시지를 전송하기 위해서는 먼저 객체에 대한 참조를 얻어야 한다.<br>
+==&gt; Customer의 order() method의 인자로 Menu와 Customer 객체를 전달받는 방법을 사용하기로 하자.</p>
+<p>Customer 의 인터페이스를 변경해보자.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Customer</span> {
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">order</span>(String menuName, Menu menu, Barista barista) {
+        MenuItem menuItem <span style="color:#f92672">=</span> menu.choose(menuName);
+        Coffee coffee <span style="color:#f92672">=</span> barista.makeCoffee(menuItem);
+        ...
+    }
+};
+</code></pre></div><h4 id="42-menu">4.2 Menu</h4>
+<p>Menu 는 menuName 에 해당하는 MenuItem을 찾아야 하기 때문에 내부적으로 MenuItem을 가지고 있어야 한다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Menu</span> {
+	Menu(std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span>MenuItem<span style="color:#f92672">*&gt;</span> items) {
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>items <span style="color:#f92672">=</span> items;
+    }
+	MenuItem<span style="color:#f92672">*</span> <span style="color:#a6e22e">choose</span>(std<span style="color:#f92672">::</span>string name) {
+		<span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">auto</span> each : items) {
+			<span style="color:#66d9ef">if</span> (<span style="color:#ae81ff">0</span> <span style="color:#f92672">==</span> each<span style="color:#f92672">-&gt;</span>getName().compare(name)) {
+				<span style="color:#66d9ef">return</span> each;
+			}
+		}
+		<span style="color:#66d9ef">return</span> NULL;
+	}
+	std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span>MenuItem<span style="color:#f92672">*&gt;</span> items;
+};
+</code></pre></div><h4 id="43-barista">4.3 Barista</h4>
+<p>barista는 menuItem을 제공받아 커피를 제조한다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Barista</span>
+{
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+	Coffee<span style="color:#f92672">*</span> makeCoffee(MenuItem<span style="color:#f92672">*</span> menuItem)
+	{
+		Coffee<span style="color:#f92672">*</span> coffee <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Coffee(menuItem);
+		<span style="color:#66d9ef">return</span> coffee;
+	}
+};
+</code></pre></div><p><img src="/img/oop_coffee.svg" alt="coffee"></p>
+<h3 id="완성된-코드">완성된 코드</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;list&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#75715e">//#define _debug
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MenuItem</span>
+{
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+	MenuItem(std<span style="color:#f92672">::</span>string name, <span style="color:#66d9ef">int</span> price)
+	{
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>name <span style="color:#f92672">=</span> name;
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>price <span style="color:#f92672">=</span> price;
+<span style="color:#75715e">#ifdef _debug
+</span><span style="color:#75715e"></span>	std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Constructor of MenuItem: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>name <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+<span style="color:#75715e">#endif
+</span><span style="color:#75715e"></span>	}
+	<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">cost</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>price; }
+	std<span style="color:#f92672">::</span>string getName() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>name; }
+
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+	std<span style="color:#f92672">::</span>string name;
+	<span style="color:#66d9ef">int</span> price;
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Menu</span>
+{
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+	Menu(std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span>MenuItem<span style="color:#f92672">*&gt;</span> items)
+	{
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>items <span style="color:#f92672">=</span> items;
+<span style="color:#75715e">#ifdef _debug
+</span><span style="color:#75715e"></span>		std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Constructor of Menu: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> items.size() <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+<span style="color:#75715e">#endif
+</span><span style="color:#75715e"></span>	}
+
+	MenuItem<span style="color:#f92672">*</span> <span style="color:#a6e22e">choose</span>(std<span style="color:#f92672">::</span>string name)
+	{
+		<span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">auto</span> each : items)
+		{
+			<span style="color:#66d9ef">if</span> (<span style="color:#ae81ff">0</span> <span style="color:#f92672">==</span> each<span style="color:#f92672">-&gt;</span>getName().compare(name))
+			{
+				<span style="color:#66d9ef">return</span> each;
+			}
+		}
+		<span style="color:#66d9ef">return</span> NULL;
+	}
+	<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+	std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span>MenuItem<span style="color:#f92672">*&gt;</span> items;
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Coffee</span>
+{
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+	Coffee(MenuItem<span style="color:#f92672">*</span> menuItem)
+	{
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>name <span style="color:#f92672">=</span> menuItem<span style="color:#f92672">-&gt;</span>getName();
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>price <span style="color:#f92672">=</span> menuItem<span style="color:#f92672">-&gt;</span>cost();
+	}
+
+	std<span style="color:#f92672">::</span>string getName() { <span style="color:#66d9ef">return</span> name; }
+	<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">cost</span>() { <span style="color:#66d9ef">return</span> price; }
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+	std<span style="color:#f92672">::</span>string name;
+	<span style="color:#66d9ef">int</span> price;
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Barista</span>
+{
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+	Coffee<span style="color:#f92672">*</span> makeCoffee(MenuItem<span style="color:#f92672">*</span> menuItem)
+	{
+		Coffee<span style="color:#f92672">*</span> coffee <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Coffee(menuItem);
+<span style="color:#75715e">#ifdef _debug
+</span><span style="color:#75715e"></span>		std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Barista: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> coffee<span style="color:#f92672">-&gt;</span>getName() <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+<span style="color:#75715e">#endif
+</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">return</span> coffee;
+	}
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Customer</span>
+{
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+	<span style="color:#66d9ef">void</span> order(std<span style="color:#f92672">::</span>string menuName, Menu menu, Barista barista)
+	{
+		MenuItem<span style="color:#f92672">*</span> menuItem <span style="color:#f92672">=</span> menu.choose(menuName);
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>coffee <span style="color:#f92672">=</span> barista.makeCoffee(menuItem);
+	}
+
+	Coffee<span style="color:#f92672">*</span> <span style="color:#a6e22e">getCoffee</span>() { <span style="color:#66d9ef">return</span> coffee; }
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+	Coffee<span style="color:#f92672">*</span> coffee;
+};
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>()
+{
+	std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span>MenuItem<span style="color:#f92672">*&gt;</span> menu;
+	std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span>MenuItem<span style="color:#f92672">*&gt;::</span>iterator it;
+
+	MenuItem menuItem1(<span style="color:#e6db74">&#34;Americano&#34;</span>, <span style="color:#ae81ff">1500</span>);
+	MenuItem menuItem2(<span style="color:#e6db74">&#34;Latte&#34;</span>, <span style="color:#ae81ff">2000</span>);
+	MenuItem menuItem3(<span style="color:#e6db74">&#34;Cappuccino&#34;</span>, <span style="color:#ae81ff">2000</span>);
+	MenuItem menuItem4(<span style="color:#e6db74">&#34;Macchiato&#34;</span>, <span style="color:#ae81ff">2500</span>);
+	MenuItem menuItem5(<span style="color:#e6db74">&#34;Espresso&#34;</span>, <span style="color:#ae81ff">2500</span>);
+
+	menu.push_back(<span style="color:#f92672">&amp;</span>menuItem1);
+	menu.push_back(<span style="color:#f92672">&amp;</span>menuItem2);
+	menu.push_back(<span style="color:#f92672">&amp;</span>menuItem3);
+	menu.push_back(<span style="color:#f92672">&amp;</span>menuItem4);
+	menu.push_back(<span style="color:#f92672">&amp;</span>menuItem5);
+
+	Customer customer;
+	Barista barista;
+
+	customer.order(<span style="color:#e6db74">&#34;Americano&#34;</span>, menu, barista);
+	Coffee<span style="color:#f92672">*</span> coffee <span style="color:#f92672">=</span> customer.getCoffee();
+
+	std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;--- My Coffee ---&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+	std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> coffee<span style="color:#f92672">-&gt;</span>getName() <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+	std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> coffee<span style="color:#f92672">-&gt;</span>cost() <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+}
+</code></pre></div><p><strong>참고</strong></p>
+<blockquote>
+<p>객체지향의 사실과 오해</p>
+</blockquote>
 
 
 		
 	</div>
 
 	<div class="pagination">
-		<a href="/post/composite_pattern/" class="left arrow">&#8592;</a>
+		<a href="/post/command_pattern/" class="left arrow">&#8592;</a>
 
 		<a href="#" class="top">Top</a>
 	</div>
@@ -81,7 +282,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-03-06 10:16:14.167501 &#43;0900 KST m=&#43;0.078291815">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-03-06 11:35:27.000672 &#43;0900 KST m=&#43;0.096646935">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 

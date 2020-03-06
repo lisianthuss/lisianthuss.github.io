@@ -3,17 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://lisianthuss.github.io/post/command_pattern/</loc>
-    <lastmod>2020-03-03T11:06:56+09:00</lastmod>
+    <loc>https://lisianthuss.github.io/post/oop_coffee/</loc>
+    <lastmod>2020-03-06T09:54:58+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://lisianthuss.github.io/post/</loc>
-    <lastmod>2020-03-03T11:06:56+09:00</lastmod>
+    <lastmod>2020-03-06T09:54:58+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://lisianthuss.github.io/</loc>
+    <lastmod>2020-03-06T09:54:58+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://lisianthuss.github.io/post/command_pattern/</loc>
     <lastmod>2020-03-03T11:06:56+09:00</lastmod>
   </url>
   
