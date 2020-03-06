@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Composite_pattern &middot; 잠들지 않는 시간</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="잠들지 않는 시간" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">잠들지 않는 시간</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/post/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+    <span>Written by</span>
+        
+        <br>
+        <span>on&nbsp;</span><time datetime="2020-03-03 13:22:14 &#43;0900 KST">March 3, 2020</time>
+</div>
+		<h1 class="post-title">Composite_pattern</h1>
+<div class="post-line"></div>
+
+		
+
+		<blockquote>
+<p>전체-부분의 관계를 갖는 객체들 사이의 관계를 정의할 때 유용<br>
+클라이언트는 전체와 부분을 구분하지 않고 동일한 인터페이스를 사용할 수 있다.</p>
+</blockquote>
+<p><img src="/img/composite.svg" alt="composite"></p>
+<ul>
+<li>Component<br>
+&ndash; Leaf 클래스와 전체에 해당하는 Composite 클래스에 공통 인터페이스를 정의한다.</li>
+<li>Leaf<br>
+&ndash; Composite 객체의 부품으로 설정한다</li>
+<li>Composite<br>
+&ndash; 전체 클래스로 복수 개의 Compoenet를 갖도록 정의한다.
+&ndash; 복수 개의 Leaf, Composite 객체를 부분으로 가질 수 있다.</li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="/post/abstract_factory_pattern/" class="left arrow">&#8592;</a>
+		<a href="/post/oop_coffee/" class="right arrow">&#8594;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-03-06 10:16:14.16498 &#43;0900 KST m=&#43;0.075770623">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Observer Pattern &middot; 잠들지 않는 시간</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="잠들지 않는 시간" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">잠들지 않는 시간</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/post/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+    <span>Written by</span>
+        
+        <br>
+        <span>on&nbsp;</span><time datetime="2020-03-03 11:26:50 &#43;0900 KST">March 3, 2020</time>
+</div>
+		<h1 class="post-title">Observer Pattern</h1>
+<div class="post-line"></div>
+
+		
+
+		<blockquote>
+<p>통보 대상 객체의 관리를 Subject 클래스와 Observer 인터페이스로 일반화하여<br>
+데이터 변경을 통보하는 클래스(ConcreteSubject)는 통보 대상 클래스나<br>
+객체(ConcreteObserver)에 대한 의존성을 없앨 수 있다.<br>
+결과적으로 통보 대상 클래스나 대상 객체의 변경에도 ConcreteSubject 클래스의 수정 없이 그대로 사용할 수 있도록 한다.</p>
+</blockquote>
+<h3 id="언제-사용하지">언제 사용하지?</h3>
+<p>데이터의 변경이 발생했을 때, 상대 클래스나 객체에 의존하지 않으면서 데이터 변경을 통보하고자 할 때 유용하다.</p>
+<p><img src="/img/observer.svg" alt="observer"></p>
+<ul>
+<li>Observer<br>
+&ndash; 데이터의 변경을 통보받는 인터페이스<br>
+&ndash; Subject는 Observer 인터페이스의 update를 호출하여, ConcreteSubject의 데이터 변경을 ConcreteObserver에게 통보한다.</li>
+<li>Subject<br>
+&ndash; ConcreteObserver 객체를 관리<br>
+&ndash; Observer 인터페이스를 참조하여 Concrete Observer를 관리하므로 ConcreteObserver의 변화에 독립적일 수 있다.</li>
+<li>ConcreteSubject<br>
+&ndash; 변경 관리 대상이 되는 데이터가 있는 클래스<br>
+&ndash; 데이터를 변경을 위한 setState method에서 자신의 데이터인 subjectState를 변경하고<br>
+&ndash; Subject의 notifyObservers method를 호출해서 ConcreteObserver 객체에 변경을 통보한다.</li>
+<li>ConcreteObserver<br>
+&ndash; ConcreteSubject의 변경을 통보받는 클래스<br>
+&ndash; Observer 인터페이스의 update를 구현해서 변경을 통보받는다<br>
+&ndash; ConcreteSubject의 getState를 호출하여 변경된 데이터를 조회한다.</li>
+</ul>
+<p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="/post/command_pattern/" class="left arrow">&#8592;</a>
+		<a href="/post/decorator_pattern/" class="right arrow">&#8594;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-03-06 10:16:14.166424 &#43;0900 KST m=&#43;0.077214254">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>

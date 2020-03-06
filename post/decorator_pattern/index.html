@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Decorator Pattern &middot; 잠들지 않는 시간</title>
+
+		
+  		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="잠들지 않는 시간" />
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					<h2 class="nav-title">잠들지 않는 시간</h2>
+				</a>
+				<ul>
+    
+    
+        <li>
+            <a href="/about/">
+                
+                <span>About</span>
+                
+            </a>
+        </li>
+    
+        <li>
+            <a href="/post/">
+                
+                <span>Posts</span>
+                
+            </a>
+        </li>
+    
+</ul>
+			</div>
+		</nav>
+
+        
+
+<main>
+	<div class="post">
+		<div class="post-info">
+    <span>Written by</span>
+        
+        <br>
+        <span>on&nbsp;</span><time datetime="2020-03-03 11:59:45 &#43;0900 KST">March 3, 2020</time>
+</div>
+		<h1 class="post-title">Decorator Pattern</h1>
+<div class="post-line"></div>
+
+		
+
+		<blockquote>
+<p>기본 기능에 추가할 수 있는 많은 종류의 부가 기능에서 파생되는 다양한 조합을 동적으로 구현할 수 있는 패턴</p>
+</blockquote>
+<h3 id="언제-사용하지">언제 사용하지?</h3>
+<ul>
+<li>기본 기능에 추가할 수 있는 기능의 종류가 많은 경우, 각 추가 기능을 Decorator 클래스로 정의한 후 필요한 Decorator 객체를 조합하여 추가 기능의 조합을 설계하는 방식</li>
+</ul>
+<p><img src="/img/decorator.svg" alt="decorator"></p>
+<ul>
+<li>Component<br>
+&ndash; 기본 기능을 뜻하는 ComcreteComponent와 추가 기능을 뜻하는 Decorator의 공통 기능을 정의<br>
+&ndash; 즉 클라이언트는 Component를 통해 실제 객체를 사용한다.</li>
+<li>ConcreteComponent<br>
+&ndash; 기본 기능을 구현하는 클래스</li>
+<li>Decorator<br>
+&ndash; 공통 기능을 제공한다.</li>
+<li>ConcreteDecorator
+&ndash; Decorator의 하위 클래스로 기본 기능에 추가되는 개별적인 기능을 뜻한다.</li>
+</ul>
+<p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="/post/observer_pattern/" class="left arrow">&#8592;</a>
+		<a href="/post/template_method_pattern/" class="right arrow">&#8594;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			<span>
+			&copy; <time datetime="2020-03-06 10:16:14.164963 &#43;0900 KST m=&#43;0.075754058">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>
