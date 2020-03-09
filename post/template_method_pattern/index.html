@@ -68,6 +68,152 @@
 <h3 id="언제-사용하지">언제 사용하지?</h3>
 <p>전체적으로는 동일하면서 부분적으로는 다른 구문으로 구성된 method의 코드 중복을 최소화할 때 유용</p>
 <p><img src="/img/templateMethod.svg" alt="template"></p>
+<h2 id="예제--여러-회사-모터-지원하기-">예제 ( 여러 회사 모터 지원하기 )</h2>
+<p>엘리베이터 제어 시스템에서 모터를 구동시키는 기능을 구현하자.</p>
+<ul>
+<li>엘리베이터가 이동 중이면 모터를 구동시키지 않는다.</li>
+</ul>
+<p>현대 모터를 사용하여 문을 제어한다면 다음과 같이 설계할 수 있다.</p>
+<p><img src="/img/template_hyundai1.svg" alt="door"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">enum</span> <span style="color:#a6e22e">DoorStatus</span> { CLOSED, OPENED }
+<span style="color:#66d9ef">enum</span> <span style="color:#a6e22e">MotorStatus</span> { MOVING, STOPPED }
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Door</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    Door() { doorStatus <span style="color:#f92672">=</span> CLOSED; }
+    DoorStatus <span style="color:#a6e22e">getDoorStatus</span>() { <span style="color:#66d9ef">return</span> doorStatus; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">close</span>() { doorStatus <span style="color:#f92672">=</span> CLOSED; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">open</span>() { doorStatus <span style="color:#f92672">=</span> OPENED; }
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    DoorStatus doorStatus;
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HyundaiMotor</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    HyundaiMotor(Door<span style="color:#f92672">*</span> door) {
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>door <span style="color:#f92672">=</span> door;
+        motorStatus <span style="color:#f92672">=</span> STOPPED;
+    }
+    MotorStatus <span style="color:#a6e22e">getMotorStatus</span>() { <span style="color:#66d9ef">return</span> motorStatus; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">move</span>(Direction direction) { 
+        <span style="color:#66d9ef">if</span> (getMotorStatus() <span style="color:#f92672">==</span> MOVING) {
+            <span style="color:#66d9ef">return</span>;
+        }
+
+        <span style="color:#66d9ef">if</span> (door.getDoorStatus() <span style="color:#f92672">==</span> OPENED) {
+            door.close();
+        }
+
+        moveHyundaiMotor(direction);
+        setMotorStatus(MOVING);
+    }
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">void</span> setMotorStatus() { <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>motorStatus <span style="color:#f92672">=</span> motorStatus; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">moveHyundaiMotor</span>(Direction direction) {
+        <span style="color:#75715e">// 모터 이동
+</span><span style="color:#75715e"></span>    }
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    Door<span style="color:#f92672">*</span> door;
+    MotorStatus motorStatus;
+}
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    Door<span style="color:#f92672">*</span> door <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Door();
+    HyundaiMotor<span style="color:#f92672">*</span> hyundaiMotor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HyundaiMotor(door);
+    hyundaiMotor.move(UP);
+
+</code></pre></div><h3 id="1-문제점">1. 문제점</h3>
+<ul>
+<li>다른 회사의 모터를 제어해야 한다면?<br>
+LG 모터를 구동하는 것은 Hyundai 모터와 완전히 동일하지는 않기 때문에 HyundaiMotor 클래스를 복사한 후 일부 수정해야 한다.</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LGMotor</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">void</span> move(Direction direction) { 
+        <span style="color:#66d9ef">if</span> (getMotorStatus() <span style="color:#f92672">==</span> MOVING) {
+            <span style="color:#66d9ef">return</span>;
+        }
+
+        <span style="color:#66d9ef">if</span> (door.getDoorStatus() <span style="color:#f92672">==</span> OPENED) {
+            door.close();
+        }
+
+        moveLGMotor(direction); <span style="color:#75715e">// HyundaiMotor 와 다른 부분
+</span><span style="color:#75715e"></span>        setMotorStatus(MOVING);
+    }
+}
+</code></pre></div><p>대부분의 코드가 동일하며 move method의 일부 코드가 다른 것을 알 수 있다.</p>
+<p>*위와 같이 유사한 기능을 제공하면서 중복된 코드가 있는 경우 상속을 이용해 중복되는 코드를 상위 클래스에 모으고 다른 부분은 하위 클래스에서 구현할 수 있다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Motor</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span> 
+    Motor(Door door) {
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>door <span style="color:#f92672">=</span> door;
+        motorStatus <span style="color:#f92672">=</span> STOPPED;
+    }
+    MotorStatus <span style="color:#a6e22e">getMotorStatus</span>() { <span style="color:#66d9ef">return</span> motorStatus; }
+<span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> move(Direction direction) {}
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setMotorStatus</span>(MotorStatus motorStatus) { <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>motorStatus <span style="color:#f92672">=</span> motorStatus }
+<span style="color:#66d9ef">protected</span><span style="color:#f92672">:</span>
+    Door<span style="color:#f92672">*</span> door;
+    MotorStatus motorStatus;
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HyundaiMotor</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Motor {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    HyundaiMotor(Door door)<span style="color:#f92672">:</span> Motor(door) {}
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">void</span> moveHyundaiMotor(Direction direction) {
+        <span style="color:#75715e">// hyundai 모터 구동
+</span><span style="color:#75715e"></span>    }
+
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">move</span>(Direction direction) {
+        <span style="color:#66d9ef">if</span> (getMotorStatus() <span style="color:#f92672">==</span> MOVING) {
+            <span style="color:#66d9ef">return</span>;
+        }
+
+        <span style="color:#66d9ef">if</span> (getDoorStatus() <span style="color:#f92672">==</span> OPENED) {
+            door.close();
+        }
+
+        moveHyundaiMotor(direction);
+        setMotorStatus(MOVING);  <span style="color:#75715e">// 이 부분은 동일
+</span><span style="color:#75715e"></span>    }
+}
+</code></pre></div><p>Motor 클래스를 HyundaiMotor, LGMotor 클래스의 상위 클래스로 정의하여, Door 클래스와의 연관 관계, motorStatus 필드, getMotorStatus, setMotorStatus 의 중복을 피할 수 있었다.<br>
+하지만 move() 는 여전히 중복되는 코드가 존재하고 있다.</p>
+<h3 id="2-해결책">2. 해결책</h3>
+<p>부분적으로 코드가 중복되는 경우에는 상속을 활요하여 중복을 피할 수 있다.<br>
+move method 를 상위 클래스로 올리고, moveHyundaiMotor, moveLGMotor 호출 부분을 하위 클래스에서 override 하는 방법이다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">public</span> Motor {
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">moveMotor</span>(Direction direction) {}
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">move</span>(Direction direction) {
+        <span style="color:#66d9ef">if</span> (getMotorStatus() <span style="color:#f92672">==</span> MOVING) {
+            <span style="color:#66d9ef">return</span>;
+        }
+
+        <span style="color:#66d9ef">if</span> (getDoorStatus() <span style="color:#f92672">==</span> OPENED) {
+            door.close();
+        }
+
+        moveMotor(direction);     <span style="color:#75715e">// 하위 클래스에서 override한 method가 호출된다.
+</span><span style="color:#75715e"></span>        setMotorStatus(MOVING);
+    }
+}
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HyundaiMotor</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Motor {
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">moveMotor</span>(Direction direction) {
+        <span style="color:#75715e">// Hyundai 모터 구동
+</span><span style="color:#75715e"></span>    }
+}
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LGMotor</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Motor {
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">moveMotor</span>(Direction direction) {
+        <span style="color:#75715e">// LG 모터 구동
+</span><span style="color:#75715e"></span>    }
+}
+</code></pre></div><p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
 
 
 		
@@ -75,7 +221,7 @@
 
 	<div class="pagination">
 		<a href="/post/decorator_pattern/" class="left arrow">&#8592;</a>
-		<a href="/post/factory_method_pattern/" class="right arrow">&#8594;</a>
+		<a href="/post/oop_coffee/" class="right arrow">&#8594;</a>
 
 		<a href="#" class="top">Top</a>
 	</div>
@@ -84,7 +230,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-03-06 10:16:14.173274 &#43;0900 KST m=&#43;0.084064885">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-03-09 13:00:25.082129 &#43;0900 KST m=&#43;0.115891430">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 

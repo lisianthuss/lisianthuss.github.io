@@ -27,6 +27,31 @@ ___|
     </item>
     
     <item>
+      <title>Template Method Pattern</title>
+      <link>https://lisianthuss.github.io/post/template_method_pattern/</link>
+      <pubDate>Tue, 03 Mar 2020 12:34:39 +0900</pubDate>
+      
+      <guid>https://lisianthuss.github.io/post/template_method_pattern/</guid>
+      <description>전체적인 알고리즘은 상위 클래스에 구현하면서 다른 부분은 하위 클래스에서 구현할 수 있도록 하는 패턴
+ 언제 사용하지? 전체적으로는 동일하면서 부분적으로는 다른 구문으로 구성된 method의 코드 중복을 최소화할 때 유용
+예제 ( 여러 회사 모터 지원하기 ) 엘리베이터 제어 시스템에서 모터를 구동시키는 기능을 구현하자.
+ 엘리베이터가 이동 중이면 모터를 구동시키지 않는다.  현대 모터를 사용하여 문을 제어한다면 다음과 같이 설계할 수 있다.
+enum DoorStatus { CLOSED, OPENED } enum MotorStatus { MOVING, STOPPED } class Door { public: Door() { doorStatus = CLOSED; } DoorStatus getDoorStatus() { return doorStatus; } void close() { doorStatus = CLOSED; } void open() { doorStatus = OPENED; } private: DoorStatus doorStatus; }; class HyundaiMotor { public: HyundaiMotor(Door* door) { this-&amp;gt;door = door; motorStatus = STOPPED; } MotorStatus getMotorStatus() { return motorStatus; } void move(Direction direction) { if (getMotorStatus() == MOVING) { return; } if (door.</description>
+    </item>
+    
+    <item>
+      <title>Decorator Pattern</title>
+      <link>https://lisianthuss.github.io/post/decorator_pattern/</link>
+      <pubDate>Tue, 03 Mar 2020 11:59:45 +0900</pubDate>
+      
+      <guid>https://lisianthuss.github.io/post/decorator_pattern/</guid>
+      <description>기본 기능에 추가할 수 있는 많은 종류의 부가 기능에서 파생되는 다양한 조합을 동적으로 구현할 수 있는 패턴
+ 언제 사용하지?  기본 기능에 추가할 수 있는 기능의 종류가 많은 경우, 각 추가 기능을 Decorator 클래스로 정의한 후 필요한 Decorator 객체를 조합하여 추가 기능의 조합을 설계하는 방식   Component
+&amp;ndash; 기본 기능을 뜻하는 ComcreteComponent와 추가 기능을 뜻하는 Decorator의 공통 기능을 정의
+&amp;ndash; 즉 클라이언트는 Component를 통해 실제 객체를 사용한다. ConcreteComponent</description>
+    </item>
+    
+    <item>
       <title>Command Pattern</title>
       <link>https://lisianthuss.github.io/post/command_pattern/</link>
       <pubDate>Tue, 03 Mar 2020 11:06:56 +0900</pubDate>

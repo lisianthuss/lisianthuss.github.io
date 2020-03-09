@@ -81,6 +81,135 @@
 <li>ConcreteDecorator
 &ndash; Decorator의 하위 클래스로 기본 기능에 추가되는 개별적인 기능을 뜻한다.</li>
 </ul>
+<h2 id="예제--도로-표시-방법-조회하기-">예제 ( 도로 표시 방법 조회하기 )</h2>
+<p>네비게이션 SW 에서 도로를 표시하는 기능을 구현한다.</p>
+<ul>
+<li>도로를 선으로 표시<br>
+&ndash; RoadDisplay 클래스</li>
+<li>도로의 차선을 표시(추가 기능)<br>
+&ndash; RoadDisplayWithLane 클래스</li>
+</ul>
+<p>하위 클래스로 설계하여 다음과 같이 표현할 수 있다.
+<img src="/img/decorator_road1.svg" alt="display"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RoadDisplay</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">void</span> draw() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;기본 도로 표시&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
+}; 
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RoadDisplayWithLane</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> RoadDisplay {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">void</span> draw() {
+        RoadDisplay<span style="color:#f92672">::</span>draw();
+        drawLane();
+    }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">drawLane</span>() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;차선 표시&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
+};
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    RoadDisplay<span style="color:#f92672">*</span> road <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RoadDisplay();
+    road<span style="color:#f92672">-&gt;</span>draw();
+
+    RoadDisplayWithLane<span style="color:#f92672">*</span> roadWithLane <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RoadDisplayWithLane();
+    roadWithLane<span style="color:#f92672">-&gt;</span>draw();
+
+    <span style="color:#66d9ef">delete</span> roadWithLane;
+    <span style="color:#66d9ef">delete</span> road;
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><h3 id="1-문제점">1. 문제점</h3>
+<ul>
+<li>또다른 도로 표시 기능을 구현하고 싶다면?</li>
+<li>여러 가지 추가 기능을 조합해서 사용하고 싶다면?</li>
+</ul>
+<h4 id="11--또다른-도로-표시-기능을-구현하는-경우">1.1  또다른 도로 표시 기능을 구현하는 경우</h4>
+<p>위 설계와 동일하게 RoadDisplayWithTraffic 클래스를 RoadDisplay의 하위 클래스로 설계할 수 있다.</p>
+<h3 id="12-여러-가지-추가-기능을-조합하는-경우">1.2 여러 가지 추가 기능을 조합하는 경우</h3>
+<p>여러 개의 기능 조합을 고려해야 하는 경우, 상속을 통한 기능 확장은 각 기능별로 클래스를 추가해야 하는 단점이 있다.</p>
+<ul>
+<li>RoadDisplay</li>
+<li>RoadDisplayWithLane</li>
+<li>RoadDisplayWithTraffic</li>
+<li>RoadDisplayWithLaneTraffic</li>
+<li>RoadDisplayWithLaneCrossing</li>
+<li>RoadDisplayWithTrafficCrossing</li>
+<li>RoadDisplayWithLaneTrafficCrossing</li>
+</ul>
+<h3 id="2-해결책">2. 해결책</h3>
+<p>조합 수가 늘어나는 문제를 해결할 수 있는 설계를 하려면, 각 추가 기능별로 개별적인 클래스를 설계하고, 기능을 추가할 때 각 클래스의 객체 조합을 이용하면 된다.</p>
+<p><img src="/img/decorator_display.svg" alt="display">
+기본 기능은 RoadDisplay 객체를 사용한다. 차선을 표시하는 기능이 필요하다면, LaneDecorator 에서 차선 표시 기능만 구현하고 도로 표시 기능은 RoadDisplay 클래스의 draw method 를 호출하면 된다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Display</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    Display() {}
+    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>Display() {}
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">draw</span>() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RoadDisplay</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Display {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">void</span> draw() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;기본 도로 표시&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DisplayDecorator</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> Display {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    DisplayDecorator() {}
+    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>DisplayDecorator() { <span style="color:#66d9ef">delete</span> decoratedDisplay; }
+
+    DisplayDecorator(Display<span style="color:#f92672">*</span> display) { decoratedDisplay <span style="color:#f92672">=</span> display; }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">draw</span>() { decoratedDisplay<span style="color:#f92672">-&gt;</span>draw(); }
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    Display<span style="color:#f92672">*</span> decoratedDisplay;
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LaneDecorator</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> DisplayDecorator {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    LaneDecorator() {}
+    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>LaneDecorator() {}
+    LaneDecorator(Display<span style="color:#f92672">*</span> decoratedDisplay)<span style="color:#f92672">:</span> DisplayDecorator(decoratedDisplay) {}
+
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">draw</span>() {
+        DisplayDecorator<span style="color:#f92672">::</span>draw();
+        drawLane();
+    }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">drawLane</span>() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">차선 표시&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
+};
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TrafficDecorator</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> DisplayDecorator {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    TrafficDecorator() {}
+    <span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>TrafficDecorator() {}
+    TrafficDecorator(Display<span style="color:#f92672">*</span> decoratedDisplay)<span style="color:#f92672">:</span>DisplayDecorator(decoratedDisplay) {}
+
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">draw</span>() {
+        DisplayDecorator<span style="color:#f92672">::</span>draw();
+        drawLane();
+    }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">drawLane</span>() { std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\t</span><span style="color:#e6db74">교통량 표시&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl; }
+};
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    Display<span style="color:#f92672">*</span> road <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RoadDisplay();
+    road<span style="color:#f92672">-&gt;</span>draw();
+
+    Display<span style="color:#f92672">*</span> roadWithLane <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LaneDecorator(<span style="color:#66d9ef">new</span> RoadDisplay());
+    roadWithLane<span style="color:#f92672">-&gt;</span>draw();
+
+    Display<span style="color:#f92672">*</span> roadWithTraffic <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TrafficDecorator(<span style="color:#66d9ef">new</span> RoadDisplay());
+    roadWithTraffic<span style="color:#f92672">-&gt;</span>draw();
+
+    Display<span style="color:#f92672">*</span> roadWithLaneAndTraffic <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TrafficDecorator(<span style="color:#66d9ef">new</span> LaneDecorator(<span style="color:#66d9ef">new</span> RoadDisplay()));
+    roadWithLaneAndTraffic<span style="color:#f92672">-&gt;</span>draw();
+
+    <span style="color:#66d9ef">delete</span> roadWithLaneAndTraffic;
+
+    <span style="color:#66d9ef">delete</span> roadWithTraffic;
+    <span style="color:#66d9ef">delete</span> roadWithLane;
+    <span style="color:#66d9ef">delete</span> road;
+
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>DisplayDecorator는 Display 클래스를 상속받은 RoadDisplay 객체를 가지고 draw method를 호출하는 역할을 한다. LaneDecorator, TrafficDecorator는 생성자로 Display 객체(RoadDisplay)를 받고 draw method를 호출하면, 상위 클래스인 DisplayDecorator에서 RoadDisplay의 draw를 호출하고, 이후 자신의 draw method를 호출한다.<br>
+road, roadWithLane, roadWithTraffic 객체의 접근 이 모두 Display 클래스를 통해 이루어진다.  즉, 각 객체에 관계없이 동일한 Road 클래스를 통해 도로 정보를 표시할 수 있다.</p>
 <p>참고</p>
 <ul>
 <li>Java 객체지향 디자인 패턴</li>
@@ -91,7 +220,7 @@
 	</div>
 
 	<div class="pagination">
-		<a href="/post/observer_pattern/" class="left arrow">&#8592;</a>
+		<a href="/post/command_pattern/" class="left arrow">&#8592;</a>
 		<a href="/post/template_method_pattern/" class="right arrow">&#8594;</a>
 
 		<a href="#" class="top">Top</a>
@@ -101,7 +230,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-03-06 10:16:14.164963 &#43;0900 KST m=&#43;0.075754058">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-03-09 13:00:25.06251 &#43;0900 KST m=&#43;0.096272931">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
