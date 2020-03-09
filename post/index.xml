@@ -27,6 +27,21 @@ ___|
     </item>
     
     <item>
+      <title>Factory Method Pattern</title>
+      <link>https://lisianthuss.github.io/post/factory_method_pattern/</link>
+      <pubDate>Tue, 03 Mar 2020 12:47:00 +0900</pubDate>
+      
+      <guid>https://lisianthuss.github.io/post/factory_method_pattern/</guid>
+      <description>객체를 생성하는 코드를 별도의 class/method로 분리함으로써 객체 생성 방식의 변화를 대비하는데 유용
+  Product
+&amp;ndash; factory method로 생성될 객체의 공통 클래스 ConcreteProduct
+&amp;ndash; 객체가 생성되는 클래스 Creator
+&amp;ndash; factory method를 갖는 클래스 ConcreteCreator
+&amp;ndash; factory method를 구현하는 클래스로 ConcreteProduct 객체를 생성한다  예제 ( 여러가지 방식의 엘리베이터 스케줄링 방법 지원하기 ) 여러 대의 엘리베이터가 있는 경우, 버튼을 눌렀을 때 하나의 엘리베이터를 선택하여 이동시킨다.
+ 어떤 엘리베이터를 이동시킬지 결정하는 여러 스케줄링 방법을 적용한다.</description>
+    </item>
+    
+    <item>
       <title>Template Method Pattern</title>
       <link>https://lisianthuss.github.io/post/template_method_pattern/</link>
       <pubDate>Tue, 03 Mar 2020 12:34:39 +0900</pubDate>

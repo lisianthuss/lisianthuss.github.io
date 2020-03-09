@@ -76,6 +76,119 @@
 <li>ConcreteCreator<br>
 &ndash; factory method를 구현하는 클래스로 ConcreteProduct 객체를 생성한다</li>
 </ul>
+<h2 id="예제--여러가지-방식의-엘리베이터-스케줄링-방법-지원하기-">예제 ( 여러가지 방식의 엘리베이터 스케줄링 방법 지원하기 )</h2>
+<p>여러 대의 엘리베이터가 있는 경우, 버튼을 눌렀을 때 하나의 엘리베이터를 선택하여 이동시킨다.</p>
+<ul>
+<li>어떤 엘리베이터를 이동시킬지 결정하는 여러 스케줄링 방법을 적용한다.</li>
+</ul>
+<p><img src="/img/factory_elevator.svg" alt="factory"></p>
+<p>ElevatorManager는 스케줄링을 위해 하나의 ThroughputScheduler 객체와 엘리베이터별로 ElevatorController 객체를 갖는다.<br>
+ElevatorManager는 reqeustElevator method로 요청을 받았을 때, ThroughputScheduler 클래스의 selectElavator method를 호출하여 적절한 엘리베이터를 선택하고, 선택된 엘리베이터에 해당하는 ElavatorController 객체의 gotoFloor method를 호출한다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ElevatorManager</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    ElevatorManager(<span style="color:#66d9ef">int</span> controllerCount) {
+        <span style="color:#75715e">// controllerCount 수 만큼 ElevatorController 객체를 만들어 controllers에 추가
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> controllerCount; i<span style="color:#f92672">++</span>) {
+            controllers.append(<span style="color:#66d9ef">new</span> ElevatorController(i));
+        }
+
+        scheduler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ThroughputScheduler();
+    }
+
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">requestElevator</span>(<span style="color:#66d9ef">int</span> destination, Direction direction) {
+        <span style="color:#66d9ef">int</span> selectedElevator <span style="color:#f92672">=</span> scheduler<span style="color:#f92672">-&gt;</span>selectElevator(<span style="color:#66d9ef">this</span>, destination, direction);
+
+        controllers.at(selectElavator)<span style="color:#f92672">-&gt;</span>gotoFloor(destination);
+    }
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    std<span style="color:#f92672">::</span>vector<span style="color:#f92672">&lt;</span>ElevatorController<span style="color:#f92672">&gt;</span> controllers;
+    ThroughputScheduler<span style="color:#f92672">*</span> scheduler;
+};
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ElevatorController</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    ElevatorController(<span style="color:#66d9ef">int</span> id) { 
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>id <span style="color:#f92672">=</span> id; 
+        curFloor <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    }
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">gotoFloor</span>(<span style="color:#66d9ef">int</span> destination) {
+        std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Elevator[&#34;</span> <span style="color:#f92672">&lt;&lt;</span> id <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;]:&#34;</span> <span style="color:#f92672">+</span> curFloor <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+
+        curFloor <span style="color:#f92672">=</span> destination;
+    }
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">int</span> id;
+    <span style="color:#66d9ef">int</span> curFloor;
+}
+</code></pre></div><h3 id="1-문제점">1. 문제점</h3>
+<ul>
+<li>다른 스케줄링 전략을 사용한다면?</li>
+<li>동적으로 스케줄링 전략을 변경한다면?</li>
+</ul>
+<p>Strategy 패턴을 사용하여 동적으로 Scheduler를 변경할 수 있다.<br>
+하지만 ElevatorManager 클래스는 스케줄링 전략이 변경될 때마다 requestElevator method도 수정이 필요하다.</p>
+<p><img src="/img/factory_elevator2.svg" alt="elevator2"></p>
+<p>requestElevator method는 엘리베이터 선택과 이동이 역할이기 때문에, 엘리베이터 선택 전략에 따라 코드가 변경되는 것은 적절하지 않다.</p>
+<h3 id="11-해결책">1.1 해결책</h3>
+<p>주어진 기능을 제공하는 적절한 클래스 생성 작업을 별도의 클래스/method로 분리한다.<br>
+=&gt; 적절한 스케줄링 클래스를 생성하는 코드를requestElevator 에서 분리한다.</p>
+<p>ElevatorManager 클래스가 ThroughputScheduler, ResponseTimeScheduler 객체를 생성하는 대신 SchedulerFactory 가 객체를 생성한다.</p>
+<p><img src="/img/factory_elevator3.svg" alt="elevator3"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">enum</span> <span style="color:#a6e22e">SchedulingStrategyID</span> { RESPONSE_TIME, THROUGHPUT, DYNAMIC }
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SchedulerFactory</span> {
+    <span style="color:#66d9ef">static</span> ElevatorScheduler <span style="color:#a6e22e">getScheduler</span>(SchedulingStrategyID strategyID) {
+        ElevatorScheduler<span style="color:#f92672">*</span> scheduler <span style="color:#f92672">=</span> NULL;
+        <span style="color:#66d9ef">switch</span> (strategyID) {
+            <span style="color:#66d9ef">case</span> RESPONSE_TIME:
+                scheduler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ResponseTimeScheduler();
+                berak;
+            <span style="color:#66d9ef">case</span> THROUGHPUT:
+                scheduler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ThroughputScheduler();
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> DYNAMIC:
+                <span style="color:#66d9ef">int</span> hour <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">현재시간</span>;
+                <span style="color:#66d9ef">if</span> (hour <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">12</span>) <span style="color:#75715e">// 오전
+</span><span style="color:#75715e"></span>                    scheduler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ResponseTimeScheduler();
+                <span style="color:#66d9ef">else</span>
+                    scheduler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ThroughputScheduler();
+                <span style="color:#66d9ef">break</span>;
+
+        }
+
+        <span style="color:#66d9ef">return</span> scheduler;
+    }
+}
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ElevatorManager</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+    <span style="color:#66d9ef">void</span> requestElevator(<span style="color:#66d9ef">int</span> destination, Direction direction) {
+        <span style="color:#75715e">// int selectedElevator = scheduler-&gt;selectElevator(this, destination, direction);
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// controllers.at(selectElavator)-&gt;gotoFloor(destination);
+</span><span style="color:#75715e"></span>
+        ElevatorScheduler<span style="color:#f92672">*</span> scheduler <span style="color:#f92672">=</span> SchedulerFactory<span style="color:#f92672">::</span>getScheduler(strategyID);
+        <span style="color:#66d9ef">int</span> selectedElevator <span style="color:#f92672">=</span> scheduler<span style="color:#f92672">-&gt;</span>selectElavator(<span style="color:#66d9ef">this</span>, destination, direction);
+        controllers.at(selectElavator)<span style="color:#f92672">-&gt;</span>gotoFloor(destination);
+    }
+
+<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+    SchedulingStrategyID strategyID;
+}
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    ElevatorManager emWithResponseTimeScheduler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorManager(<span style="color:#ae81ff">2</span>, RESPONSE_TIME);
+    emWithResponseTimeScheduler<span style="color:#f92672">-&gt;</span>requestElevator(<span style="color:#ae81ff">10</span>, UP);
+
+    ElevatorManager emWithThroughputScheduler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorManager(<span style="color:#ae81ff">2</span>, THROUGHPUT);
+    emWithThroughputScheduler<span style="color:#f92672">-&gt;</span>requestElevator(<span style="color:#ae81ff">10</span>, UP);
+
+    ElevatorManager emWithDynamicScheduler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ElevatorManager(<span style="color:#ae81ff">2</span>, DYNAMIC);
+    emWithDynamicScheduler<span style="color:#f92672">-&gt;</span>requestElevator(<span style="color:#ae81ff">10</span>, UP);
+}
+</code></pre></div><p>이제 ElevatorManager 의 reqeustElevator method에서는 직접 스케줄링 클래스를 생성하는 대신 SchedulerFactory 클래스의 getScheduler 를 호출하면 된다.</p>
+<p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
 
 
 		
@@ -83,7 +196,7 @@
 
 	<div class="pagination">
 		<a href="/post/template_method_pattern/" class="left arrow">&#8592;</a>
-		<a href="/post/abstract_factory_pattern/" class="right arrow">&#8594;</a>
+		<a href="/post/oop_coffee/" class="right arrow">&#8594;</a>
 
 		<a href="#" class="top">Top</a>
 	</div>
@@ -92,7 +205,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-03-06 10:16:14.166332 &#43;0900 KST m=&#43;0.077122247">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-03-09 14:56:07.249609 &#43;0900 KST m=&#43;0.082782005">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
