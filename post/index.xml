@@ -27,6 +27,20 @@ ___|
     </item>
     
     <item>
+      <title>Composite Pattern</title>
+      <link>https://lisianthuss.github.io/post/composite_pattern/</link>
+      <pubDate>Tue, 03 Mar 2020 13:22:14 +0900</pubDate>
+      
+      <guid>https://lisianthuss.github.io/post/composite_pattern/</guid>
+      <description>전체-부분의 관계를 갖는 객체들 사이의 관계를 정의할 때 유용
+클라이언트는 전체와 부분을 구분하지 않고 동일한 인터페이스를 사용할 수 있다.
+  Component
+&amp;ndash; Leaf 클래스와 전체에 해당하는 Composite 클래스에 공통 인터페이스를 정의한다. Leaf
+&amp;ndash; Composite 객체의 부품으로 설정한다 Composite
+&amp;ndash; 전체 클래스로 복수 개의 Compoenet를 갖도록 정의한다. &amp;ndash; 복수 개의 Leaf, Composite 객체를 부분으로 가질 수 있다.  예제 ( 컴퓨터에 추가 장치 지원하기 ) 컴퓨터의 구성 장치를 Keyboard, Body, Monitor 클래스로 정의할 수 있다.</description>
+    </item>
+    
+    <item>
       <title>Abstract Factory Pattern</title>
       <link>https://lisianthuss.github.io/post/abstract_factory_pattern/</link>
       <pubDate>Tue, 03 Mar 2020 13:03:21 +0900</pubDate>
