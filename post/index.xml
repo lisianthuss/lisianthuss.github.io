@@ -27,6 +27,22 @@ ___|
     </item>
     
     <item>
+      <title>Abstract Factory Pattern</title>
+      <link>https://lisianthuss.github.io/post/abstract_factory_pattern/</link>
+      <pubDate>Tue, 03 Mar 2020 13:03:21 +0900</pubDate>
+      
+      <guid>https://lisianthuss.github.io/post/abstract_factory_pattern/</guid>
+      <description>관련성 있는 여러 종류의 객체를 일관성 있는 방식으로 생성할 때 유용
+  AbstractFactory
+&amp;ndash; factory 클래스의 공통 인터페이스
+&amp;ndash; 각 제품의 부품을 생성하는 기능을 추상 method로 정의한다. ConcreteFactory
+&amp;ndash; AbstractFactory 클래스의 abstrace method를 override 해서 prodct를 만든다. AbstractProduct
+&amp;ndash; product 의 공통 인터페이스 ConcreteProduct
+&amp;ndash; factory 에서 생성되는 객체  예제 ( 엘리베이터 부품 업체 변경하기 ) 엘리베이터를 구성하는 부품 중 모터와 문을 예를 들어보자.
+각 제조업체별로 모터와 문을 생산한다.</description>
+    </item>
+    
+    <item>
       <title>Factory Method Pattern</title>
       <link>https://lisianthuss.github.io/post/factory_method_pattern/</link>
       <pubDate>Tue, 03 Mar 2020 12:47:00 +0900</pubDate>

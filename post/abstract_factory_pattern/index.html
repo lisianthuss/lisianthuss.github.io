@@ -63,7 +63,7 @@
 		
 
 		<blockquote>
-<p>관련성 있는 여러 종류의 객체를 일관성 있는 방석으로 생성할 때 유용</p>
+<p>관련성 있는 여러 종류의 객체를 일관성 있는 방식으로 생성할 때 유용</p>
 </blockquote>
 <p><img src="/img/abstract_factory.svg" alt="abstract"></p>
 <ul>
@@ -77,6 +77,118 @@
 <li>ConcreteProduct<br>
 &ndash; factory 에서 생성되는 객체</li>
 </ul>
+<h2 id="예제--엘리베이터-부품-업체-변경하기-">예제 ( 엘리베이터 부품 업체 변경하기 )</h2>
+<p>엘리베이터를 구성하는 부품 중 모터와 문을 예를 들어보자.<br>
+각 제조업체별로 모터와 문을 생산한다. 제조업체가 다르더라도 각 부품은 같은 동작을 하기 때문에 다른 부품을 사용하더라도 코드의 변경은 최소화 되어야 한다.</p>
+<p><img src="/img/abstract_elevator.svg" alt="elevator"></p>
+<p>Motor 와 Door 클래스에서는 template method 패턴을 사용하여, 공통되는 동작을 상위 클래스에 구현하고 각각의 개별 동작은 하위 클래스에 구현할 수 있다.</p>
+<p>엘리베이터 입장에서 특정 제조업체의 모터와 문을 제어하려는 경우, MotorFactory 클래스를 정의하여 LGMotor와 HyundaiMotor 중에 선택하여 Motor, Door 객제를 생성할 수 있다.</p>
+<p><img src="/img/abstract_factory2.svg" alt="elevator"></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">enum</span> <span style="color:#a6e22e">VenderID</span> { LG, HYUNDAI }
+
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MotorFactory</span> {
+    <span style="color:#66d9ef">static</span> Motor<span style="color:#f92672">*</span> <span style="color:#a6e22e">createMotor</span>(VenderID venderID) {
+        Motor<span style="color:#f92672">*</span> motor <span style="color:#f92672">=</span> NULL;
+        <span style="color:#66d9ef">switch</span> (venderID) {
+            <span style="color:#66d9ef">case</span> LG:
+                motor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LGMotor();
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> HYUNDAI:
+                motor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HyundaiMotor();
+                <span style="color:#66d9ef">break</span>;
+        }
+        <span style="color:#66d9ef">return</span> motor;
+    }
+}
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    Door<span style="color:#f92672">*</span> lgDoor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> DoorFactory<span style="color:#f92672">::</span>createDoor(LG);
+    Motor<span style="color:#f92672">*</span> lgMotor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> MotorFactory<span style="color:#f92672">::</span>createMotor(LG);
+    lgMotor<span style="color:#f92672">-&gt;</span>setDoor(lgDoor);
+
+    lgDoor.open();
+    lgMotor.move(UP);
+}
+</code></pre></div><h3 id="1-문제점">1. 문제점</h3>
+<ul>
+<li>다른 제조업체의 부품을 사용해야 한다면?(HyundaiMotor, HyundaiDoor)</li>
+<li>새로운 제조업제 부품을 지원해야 한다면?(SamsungMotor, SamsungDoor)</li>
+</ul>
+<h4 id="11-다른-제조업체의-부품을-사용하는-경우">1.1 다른 제조업체의 부품을 사용하는 경우</h4>
+<p>LG 대신 Hyundai의 부품을 사용하도록 고쳐보자.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    Door<span style="color:#f92672">*</span> hyundaiDoor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> DoorFactory<span style="color:#f92672">::</span>createDoor(hyundai);
+    Motor<span style="color:#f92672">*</span> hyundaiMotor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> MotorFactory<span style="color:#f92672">::</span>createMotor(hyundai);
+    hyundaiMotor<span style="color:#f92672">-&gt;</span>setDoor(hyundaiDoor);
+
+    hyundaiDoor.open();
+    hyundaiMotor.move(UP);
+}
+</code></pre></div><p>부품이 Motor와 Door 외에 다수가 있을 경우, 필요한 Factory 개수도 많아지며 그에 따라 수정해야 할 코드량은 비례하게 된다.</p>
+<h4 id="12-새로운-제조업제-부품을-지원해야-한다면">1.2 새로운 제조업제 부품을 지원해야 한다면</h4>
+<p>새로운 제조업체 Samsung 이 추가된다면, SamsungMotor, SamsungDoor 클래스가 필요하며, Factory 클래스의 수정이 요구된다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DoorFactory</span> {
+    <span style="color:#66d9ef">static</span> Door<span style="color:#f92672">*</span> <span style="color:#a6e22e">createDoor</span>(VenderID venderID) {
+        Door<span style="color:#f92672">*</span> door <span style="color:#f92672">=</span> NULL;
+        <span style="color:#66d9ef">switch</span> (venderID) {
+            <span style="color:#66d9ef">case</span> LG:
+                door <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LGDoor();
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> HYUNDAI:
+                door <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HyundaiDoor;
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> SAMSUNG:
+                door <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> SamsungDoor;
+                <span style="color:#66d9ef">break</span>;
+        }
+        <span style="color:#66d9ef">return</span> door;
+    }
+}
+</code></pre></div><p>factory method 를 사용한 객체 생성은 관련 있는 여러 개의 객체를 일관성 있는 방식으로 생성하는 경우에 많은 코드 수정이 필요하다.</p>
+<h3 id="2-해결책">2. 해결책</h3>
+<p>여러 종류의 객체를 생성할 때, 객체들 사이의 관련성이 있는 경우( LG 모터를 사용하면 LG 문을 사용 ) 각 종류별로 Factory 클래스를 사용하는 대신, 관련 객체를 일관성 있게 생성하는 Factory 클래스를 사용해보자</p>
+<ul>
+<li>업체별로 Factory 클래스를 만든다.</li>
+</ul>
+<p><img src="/img/abstract_factory3.svg" alt="factory3">
+ElevatorFactory 클래스를 LGElevatorFactory, HyundaiElevatorFactory 의 상위 클래스로 설계가 가능하다.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ElevatorFactory</span> {
+    <span style="color:#66d9ef">virtual</span> Motor<span style="color:#f92672">*</span> <span style="color:#a6e22e">createMotor</span>() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">virtual</span> Door<span style="color:#f92672">*</span> <span style="color:#a6e22e">createDoor</span>() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+};
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LGElevatorFactory</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> ElevatorFactory {
+    Motor<span style="color:#f92672">*</span> <span style="color:#a6e22e">createMotor</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> LGMotor(); }
+    Door<span style="color:#f92672">*</span> <span style="color:#a6e22e">createDoor</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> LGDoor(); }
+};
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HyundaiElevatorFactory</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> ElevatorFactory {
+    Motor<span style="color:#f92672">*</span> <span style="color:#a6e22e">createMotor</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> HyundaiMotor(); }
+    Door<span style="color:#f92672">*</span> <span style="color:#a6e22e">createDoor</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> HyundaiDoor(); }
+};
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    ElevatorFactory<span style="color:#f92672">*</span> factory <span style="color:#f92672">=</span> NULL;
+    <span style="color:#66d9ef">if</span> (LG <span style="color:#f92672">==</span> vender) {
+        factory <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> LGElevatorFactory();
+    }
+    <span style="color:#66d9ef">else</span> (HYUNDAI <span style="color:#f92672">==</span> vender) {
+        factory <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HyundaiElevatorFactory();
+    }
+
+    Door<span style="color:#f92672">*</span> door <span style="color:#f92672">=</span> factory<span style="color:#f92672">-&gt;</span>createDoor();
+    Motor<span style="color:#f92672">*</span> motor <span style="color:#f92672">=</span> factory<span style="color:#f92672">-&gt;</span>createMotor();
+
+    motor<span style="color:#f92672">-&gt;</span>setDoor(door);
+
+    door<span style="color:#f92672">-&gt;</span>open();
+    motor<span style="color:#f92672">-&gt;</span>move(UP);
+
+    <span style="color:#66d9ef">delete</span> factory;
+}
+</code></pre></div><p>어느 제조업체의 부품을 사용하던지 코드의 변경이 필요 없다.</p>
+<p>참고</p>
+<ul>
+<li>Java 객체지향 디자인 패턴</li>
+</ul>
 
 
 		
@@ -84,7 +196,7 @@
 
 	<div class="pagination">
 		<a href="/post/factory_method_pattern/" class="left arrow">&#8592;</a>
-		<a href="/post/composite_pattern/" class="right arrow">&#8594;</a>
+		<a href="/post/oop_coffee/" class="right arrow">&#8594;</a>
 
 		<a href="#" class="top">Top</a>
 	</div>
@@ -93,7 +205,7 @@
 
         		<footer>
 			<span>
-			&copy; <time datetime="2020-03-06 10:16:14.164953 &#43;0900 KST m=&#43;0.075743195">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2020-03-09 20:02:28.284719 &#43;0900 KST m=&#43;0.089267940">2020</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
